@@ -50,14 +50,14 @@ public class ResponseBuilder
         responseString += "ResponseInfo:TimeElapsed=" + currentResponse.ResponseInfo.TimeElapsed + ";\n";
         responseString += "ResponseInfo:ObjectType=" + currentResponse.ResponseInfo.ObjectType + ";\n";
 
-        responseString += currentResponse.ResponseInfo.ObjectType + ":Properties=\n{\n";
+        responseString += currentResponse.ResponseInfo.ObjectType + ":Properties={";
         // Add all Properties:
 
         for (Map.Entry<String, String> property : currentResponse.Properties.entrySet())
         {
-            responseString += property.getKey() + "=" + property.getValue() + ";\n";
+            responseString += property.getKey() + "=" + property.getValue() + "&";
         }
-        responseString += "}\n";
+        responseString += "};\n";
         responseString += "EndResponse;";
         return responseString;
     }

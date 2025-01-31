@@ -5,14 +5,14 @@ import Server.Models.Protocol.Request;
 
 import java.util.HashMap;
 
-public class RequestDecoder
+public class RequestDecoder extends DecoderBase
 {
     private Request currentRequest;
     public Request DeserializeRequest(String request)
     {
         currentRequest = new Request();
         String[] lines = request.split(";");
-        RemoveLineBreakFromLines(lines);
+        this.RemoveLineBreakFromLines(lines);
         if(lines[0].equals("StartRequest") && lines[lines.length-1].equals("EndRequest"))
         {
             for (String line : lines)
@@ -22,11 +22,7 @@ public class RequestDecoder
         }
         return currentRequest;
     }
-    private void RemoveLineBreakFromLines(String[] lines){
-        for (int i = 0; i < lines.length; i++) {
-            lines[i] = lines[i].replaceAll("\\r?\\n", "");
-        }
-    }
+
     private void DeserializeLine(String line)
     {
         String propertyBase = line.split(":")[0];

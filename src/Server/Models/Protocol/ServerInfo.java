@@ -11,4 +11,10 @@ public class ServerInfo
         this.Port = Port;
         this.Hostname = Hostname;
     }
+    public ServerInfo()
+    {
+        this.IPAddress = "";
+        this.Port = 0;
+        this.Hostname = "";
+    }
 }

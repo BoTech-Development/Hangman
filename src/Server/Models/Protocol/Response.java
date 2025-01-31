@@ -17,4 +17,12 @@ public class Response
         this.Properties = Properties;
         this.Ctor = Ctor;
     }
+    public Response()
+    {
+        this.Version = "";
+        this.ServerInfo = new ServerInfo();
+        this.ResponseInfo = new ResponseInfo();
+        this.Properties = new HashMap<String, String>();
+        this.Ctor = new HashMap<String, String>();
+    }
 }

@@ -14,4 +14,10 @@ public class ResponseInfo
         this.Started = started;
         this.ObjectType = objectType;
     }
+    public ResponseInfo(){
+        this.RequestID = 0;
+        this.Started = LocalDateTime.now();
+        this.ObjectType = "";
+        this.TimeElapsed = "";
+    }
 }
