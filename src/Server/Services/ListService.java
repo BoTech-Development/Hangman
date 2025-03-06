@@ -13,6 +13,13 @@ public class ListService {
         };
         return searchUserFunc;
     }
+    public static Function<User, Boolean> GetStandardUserSearchMethod(int ID)
+    {
+        Function<User, Boolean> searchUserFunc = (User) -> {
+            return User.ID == ID;
+        };
+        return searchUserFunc;
+    }
     public static <T> List<T> FindAll(List<T> list, Function<T, Boolean> searchFunction)
     {
         List<T> resultList = new List<T>();

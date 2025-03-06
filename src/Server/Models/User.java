@@ -14,6 +14,7 @@ public class User
     public List<Game> PlayedGames = new List<Game>();
     public List<Game> CreatedGames = new List<Game>();
     public List<Session> Sessions = new List<Session>();
+    public User(){}
     public User(String UserName, String Password, String Email){
         this.UserName = UserName;
         this.Password = Password;

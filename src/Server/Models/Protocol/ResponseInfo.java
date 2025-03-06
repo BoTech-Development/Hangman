@@ -8,15 +8,14 @@ public class ResponseInfo
     public int RequestID;
     public String TimeElapsed;
     public String ObjectType;
-    private LocalDateTime Started;
-    public ResponseInfo(int requestID, LocalDateTime started, String objectType){
+
+    public ResponseInfo(int requestID, String objectType){
         this.RequestID = requestID;
-        this.Started = started;
+
         this.ObjectType = objectType;
     }
     public ResponseInfo(){
         this.RequestID = 0;
-        this.Started = LocalDateTime.now();
         this.ObjectType = "";
         this.TimeElapsed = "";
     }

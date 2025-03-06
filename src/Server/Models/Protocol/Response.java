@@ -7,22 +7,22 @@ public class Response
     public String Version;
     public ServerInfo ServerInfo;
     public ResponseInfo ResponseInfo;
-    public HashMap<String, String> Properties;
-    public HashMap<String, String> Ctor;
 
-    public Response(String Version, ServerInfo ServerInfo, ResponseInfo ResponseInfo, HashMap<String, String> Properties, HashMap<String, String> Ctor){
+    public HashMap<String, String> Ctor;
+    public Object Object;
+
+    public Response(String Version, ServerInfo ServerInfo, ResponseInfo ResponseInfo,Object Object, HashMap<String, String> Ctor){
         this.Version = Version;
         this.ServerInfo = ServerInfo;
         this.ResponseInfo = ResponseInfo;
-        this.Properties = Properties;
         this.Ctor = Ctor;
+        this.Object = Object;
     }
     public Response()
     {
         this.Version = "";
         this.ServerInfo = new ServerInfo();
         this.ResponseInfo = new ResponseInfo();
-        this.Properties = new HashMap<String, String>();
         this.Ctor = new HashMap<String, String>();
     }
 }

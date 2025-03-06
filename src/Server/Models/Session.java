@@ -2,6 +2,7 @@ package Server.Models;
 
 import Server.Services.IDProvider;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Session
@@ -25,6 +26,7 @@ public class Session
     }
     public Boolean IsUniqueSessionStringValid(String sessionString)
     {
-        return GetDecodedUniqueSessionString().equals(sessionString);
+        Duration diff = Duration.between(CreationDate, LocalDateTime.now());
+        return GetDecodedUniqueSessionString().equals(sessionString) && diff.toMinutes() < 20;
     }
 }

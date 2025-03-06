@@ -1,26 +1,63 @@
-import Server.Services.Protocol.RequestDecoder;
-import Server.Services.Protocol.ResponseDecoder;
+import Client.ClientController;
+import Server.Controller.ServerController;
+import Server.Models.Game;
+import Server.Models.GameStatistics;
+import Server.Models.Protocol.Request;
+import Server.Models.Protocol.Response;
+import Server.Models.User;
+import Server.Services.Protocol.*;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        new RequestDecoder().DeserializeRequest("StartRequest;\n" +
-                "ProtocolInfo:Version=V1.1.0;\n" +
-                "ClientInfo:Hostname=SurfaceVonFlo;\n" +
-                "ClientInfo:SessionString=103_SurfaceVonFlo_128.128.128.0;\n" +
-                "ClientInfo:IPAddress=128.128.128.0;\n" +
-                "EndPoint:Function=StartGame;\n" +
-                "Param:UserID=103;\n" +
-                "Param:GameID=213;\n" +
-                "EndRequest;");
-        new ResponseDecoder().DeserializeResponse("StartResponse;\n" +
-                "ProtocolInfo:Version=V1.1.0;\n" +
-                "ServerInfo:IPAddress=127.127.0.1;\n" +
-                "ServerInfo:Port=80;\n" +
-                "ServerInfo:Hostname=ServerName;\n" +
-                "ResponseInfo:RequestID=83247;\n" +
-                "ResponseInfo:TimeElapsed=2523ms;\n" +
-                "ResponseInfo:ObjectType=Game;\n" +
-                "Game:Properties={ID=213,Word=Baum};\n" +
-                "EndResponse;");
+    public static void main(String[] args)
+    {
+       /*
+
+        User user = new User("Florian128", "Florian-12345", "fteetz@outlook.de");
+        user.CurrentGame = new GameStatistics();
+        user.CurrentGame.Game = new Game();
+        user.CurrentGame.Game.ID = 1;
+        user.CurrentGame.Game.Level = 3;
+        user.CurrentGame.Game.Word = "DifficultWord";
+        user.CurrentGame.MaxTries = 10;
+        user.CurrentGame.Won = false;
+        user.CurrentGame.WrongTries = 5;
+        user.CurrentGame.StartedAt = LocalDateTime.now();
+
+
+
+        ResponseBuilder rb = new ResponseBuilder();
+        rb.Create(3723, user);
+        String serialized = rb.Serialize();
+
+        ResponseDecoder rd = new ResponseDecoder();
+        Response rp = rd.DeserializeResponse(serialized);
+
+        RequestBuilder rb1 = new RequestBuilder();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("User", user);
+
+
+        rb1.Create("UniqueSession", "Login", hashMap);
+        String requestString = rb1.Serialize();
+
+        RequestDecoder rd1 = new RequestDecoder();
+        Request request = rd1.DeserializeRequest(requestString);
+
+        */
+        Scanner sc = new Scanner(System.in);
+        String type = sc.next();
+        if(type.equals("c")){
+            ClientController cC = new ClientController("127.0.0.1", 8000);
+
+        }else if(type.equals("s")) {
+            ServerController Server = new ServerController(8000);
+        }
+    }
+    public void RegisterTest(){
+
     }
 }

@@ -4,9 +4,11 @@ import Server.Models.Protocol.ClientInfo;
 import Server.Models.Protocol.Response;
 import Server.Models.Protocol.ResponseInfo;
 import Server.Models.Protocol.ServerInfo;
+import Server.Models.User;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class ResponseDecoder extends DecoderBase
 {
@@ -22,23 +24,40 @@ public class ResponseDecoder extends DecoderBase
                 if(!line.equals("StartResponse") && !line.equals("EndResponse")) DeserializeLine(line);
             }
         }
+
+        //CreateObject();
+
         return currentResponse;
     }
+    private void CreateObject()
+    {
+        try {
+            Class<?> newClass = Class.forName(currentResponse.ResponseInfo.ObjectType);
+            currentResponse.Object = newClass.getDeclaredConstructor().newInstance();
+        }catch (Exception e){
+            System.out.println("Error by Deserializing the response: " + e.getMessage());
+        }
 
+    }
     private void DeserializeLine(String line)
     {
         if(line.contains("{") && line.contains("}"))
         {
+            // When the String contains Object Notation:
             String className = line.split(":")[0];
             String propertyName = line.split(":")[1].split("=")[0];
             String propertyValue = line.substring(line.indexOf("=") + 1);
             if(className.equals(currentResponse.ResponseInfo.ObjectType)){
                 switch(propertyName){
                     case "Properties":
-                        currentResponse.Properties = DeserializeHashMap(propertyValue);
+                        try {
+                            currentResponse.Object = this.DecodePropertiesString(propertyValue, Class.forName(className));
+                        }catch (ClassNotFoundException e){
+                            System.out.println("Error by Deserializing the response: " + e.getMessage());
+                        }
                         break;
                         case "Ctor":
-                            currentResponse.Ctor = DeserializeHashMap(propertyValue);
+                            //currentResponse.Ctor = DeserializeHashMap(propertyValue);
                             break;
                 }
             }
@@ -62,6 +81,12 @@ public class ResponseDecoder extends DecoderBase
                         break;
                     case "ResponseInfo":
                         DeserializeResponseInfo(propertyName, propertyValue);
+                        break;
+                    case "Value":
+                        // It is a Primitive Type:
+                        if(propertyValue.equals("NULL") && propertyName.equals("NOTYPE")){ currentResponse.Object = null;}else {
+                            currentResponse.Object = TryToParsePrimitive(propertyValue, propertyName);
+                        }
                         break;
                 }
             }

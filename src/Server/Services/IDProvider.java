@@ -17,6 +17,12 @@ public class IDProvider
     {
 
     }
+    /// <summary>
+    /// This Method tries to set the ID Property to the correct ID in the given Object.
+    /// Supported Types User, Session, Game
+    /// </summary>
+    /// @param obj The Object where the ID Property should be set.
+    /// @return Returns true when the Set operation was successfully.
     public boolean GetAndSetNewIDForObject(Object obj)
     {
         if(IsInAcceptedTypes(obj.getClass().getName()))

@@ -1,16 +1,19 @@
 package Server.Services.Protocol;
 
+import Abitur.List;
 import Server.Models.Protocol.Response;
 import Server.Models.Protocol.ResponseInfo;
 import Server.Models.Protocol.ServerInfo;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.Inet4Address;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+
 import java.util.Map;
 
-public class ResponseBuilder
+public class ResponseBuilder extends BuilderBase
 {
     private Response currentResponse;
     private ServerInfo currentServerInfo;
@@ -26,39 +29,38 @@ public class ResponseBuilder
     }
     public void Create(int ID, Object object)
     {
-        HashMap<String, String> Parameters = new HashMap<>();
-        for(Field field : object.getClass().getFields())
-        {
-            try {
-                Parameters.put(field.getName(), field.get(object).toString());
-            }catch (Exception e){
-                System.out.println("Could not get parameter: " + field.getName() + " from " + object.getClass().getName());
-            }
-
-        }
-        ResponseInfo responseInfo = new ResponseInfo(ID, LocalDateTime.now(), object.getClass().getName());
-        currentResponse = new Response("V1.1.0", currentServerInfo, responseInfo, Parameters, new HashMap<String, String>());
+        ResponseInfo responseInfo = new ResponseInfo(ID, object.getClass().getName());
+        currentResponse = new Response("V1.1.0", currentServerInfo, responseInfo, object, new HashMap<String, String>());
     }
     public String Serialize(){
-        String responseString = "StartResponse;";
-        responseString += "ProtocolInfo:Version=" + currentResponse.Version + ";\n";
-        responseString += "ServerInfo:IPAddress=" + currentResponse.ServerInfo.IPAddress + ";\n";
-        responseString += "ServerInfo:Hostname=" + currentResponse.ServerInfo.Hostname + ";\n";
-        responseString += "ServerInfo:Port=" + currentResponse.ServerInfo.Port + ";\n";
+        String responseString = "StartResponse;";//\n";
+        responseString += "ProtocolInfo:Version=" + currentResponse.Version + ";";//\n";
+        responseString += "ServerInfo:IPAddress=" + currentResponse.ServerInfo.IPAddress + ";";//\n";
+        responseString += "ServerInfo:Hostname=" + currentResponse.ServerInfo.Hostname + ";";//\n";
+        responseString += "ServerInfo:Port=" + currentResponse.ServerInfo.Port + ";";//\n";
 
-        responseString += "ResponseInfo:RequestID=" + currentResponse.ResponseInfo.RequestID + ";\n";
-        responseString += "ResponseInfo:TimeElapsed=" + currentResponse.ResponseInfo.TimeElapsed + ";\n";
-        responseString += "ResponseInfo:ObjectType=" + currentResponse.ResponseInfo.ObjectType + ";\n";
+        responseString += "ResponseInfo:RequestID=" + currentResponse.ResponseInfo.RequestID + ";";//\n";
+        responseString += "ResponseInfo:TimeElapsed=" + currentResponse.ResponseInfo.TimeElapsed + ";";//\n";
+        responseString += "ResponseInfo:ObjectType=" + currentResponse.ResponseInfo.ObjectType + ";";//\n";
+        if(currentResponse.Object != null) {
+            if (currentResponse.Object.getClass().isPrimitive() || currentResponse.Object.getClass().getName().contains("String") || currentResponse.Object.getClass().getName().contains("Character")) {
+                // The Type is Primitive => it is not necessary to use json
+                responseString += "Value:" + currentResponse.ResponseInfo.ObjectType + "=" + currentResponse.Object.toString() + ";";
 
-        responseString += currentResponse.ResponseInfo.ObjectType + ":Properties={";
-        // Add all Properties:
-
-        for (Map.Entry<String, String> property : currentResponse.Properties.entrySet())
-        {
-            responseString += property.getKey() + "=" + property.getValue() + "&";
+            }
+            else
+            {
+                responseString += currentResponse.ResponseInfo.ObjectType + ":Properties={";
+                responseString += this.CreateParamStringForObject(currentResponse.Object);
+                responseString += "};";//\n";
+            }
         }
-        responseString += "};\n";
+        else
+        {
+            responseString += "Value:" + "NOTYPE" + "=NULL;";
+        }
         responseString += "EndResponse;";
         return responseString;
     }
+
 }
