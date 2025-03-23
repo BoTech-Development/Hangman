@@ -50,10 +50,16 @@ public class ResponseDecoder extends DecoderBase
             if(className.equals(currentResponse.ResponseInfo.ObjectType)){
                 switch(propertyName){
                     case "Properties":
-                        try {
-                            currentResponse.Object = this.DecodePropertiesString(propertyValue, Class.forName(className));
-                        }catch (ClassNotFoundException e){
-                            System.out.println("Error by Deserializing the response: " + e.getMessage());
+                        if(propertyValue.equals("{TRUE}")){
+                            currentResponse.Object = true;
+                        }else if(propertyValue.equals("{FALSE}")){
+                            currentResponse.Object = false;
+                        }else {
+                            try {
+                                currentResponse.Object = this.DecodePropertiesString(propertyValue, Class.forName(className));
+                            } catch (ClassNotFoundException e) {
+                                System.out.println("Error by Deserializing the response: " + e.getMessage());
+                            }
                         }
                         break;
                         case "Ctor":
@@ -63,7 +69,7 @@ public class ResponseDecoder extends DecoderBase
             }
             else
             {
-                System.out.println("Error by deserializing line: " + line + ". The ObjectType is not set to the currect Value or the Set statement is not above this Statement.");
+                System.out.println("Error by deserializing line: " + line + ". The ObjectType is not set to the correct Value or the Set statement is not above this Statement.");
             }
         }
         else

@@ -2,7 +2,7 @@ package Server.Models;
 
 public class Game
 {
-    public int ID = 0;
+    public int ID = -1;
     public String Word = "";
     public int Level = 0;
     public Game(){

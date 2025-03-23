@@ -4,8 +4,10 @@ import Abitur.Client;
 import Abitur.List;
 import Server.Models.Game;
 import Server.Models.GameStatistics;
+import Server.Models.Protocol.ListModelGame;
 import Server.Models.Protocol.Response;
 import Server.Models.Protocol.UserInfo;
+import Server.Models.User;
 import Server.Services.Protocol.RequestBuilder;
 import Server.Services.Protocol.ResponseBuilder;
 import Server.Services.Protocol.ResponseDecoder;
@@ -13,6 +15,7 @@ import Server.Services.Protocol.ResponseDecoder;
 import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 
 public class ClientController extends Client
@@ -73,15 +76,23 @@ public class ClientController extends Client
 
     private void Register(){
         try {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Registering Client:");
+            System.out.print("Email:");
+            String email = scanner.nextLine();
+            System.out.print("Password:");
+            String password = scanner.nextLine();
+            System.out.print("Username:");
+            String userName = scanner.nextLine();
 
             RequestBuilder rb = new RequestBuilder();
             HashMap<String, Object> params = new HashMap<>();
             //TODO: Create an Input for The UserName, Password and Email
             params.put("ipAddress", Inet4Address.getLocalHost().getHostAddress());
             params.put("hostname", Inet4Address.getLocalHost().getHostName());
-            params.put("userName", "Florian");
-            params.put("password", "Florian-12345");
-            params.put("email", "fteetz@outlook.de");
+            params.put("userName", userName);
+            params.put("password", password);
+            params.put("email", email);
             rb.Create("", "Register", params);
             String requestText = rb.Serialize();
             this.send(requestText);
@@ -92,11 +103,18 @@ public class ClientController extends Client
     }
     private void Login(){
         try{
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Login:");
+            System.out.print("Username:");
+            String userName = scanner.nextLine();
+            System.out.print("Password:");
+            String password = scanner.nextLine();
+
             RequestBuilder rb = new RequestBuilder();
             HashMap<String, Object> params = new HashMap<>();
-            //TODO: Create an Input for The UserName and Password
-            params.put("userName", "Florian");
-            params.put("password", "Florian-12345");
+
+            params.put("userName", userName);
+            params.put("password", password);
             params.put("ipAddress", Inet4Address.getLocalHost().getHostAddress());
             params.put("hostname", Inet4Address.getLocalHost().getHostName());
 
@@ -110,11 +128,18 @@ public class ClientController extends Client
     }
     private void CreateNewGame(){
         try{
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("CreateNewGame:");
+            System.out.print("Word:");
+            String word = scanner.nextLine();
+            System.out.print("Level:");
+            String level = scanner.nextLine();
+
             RequestBuilder rb = new RequestBuilder();
             HashMap<String, Object> params = new HashMap<>();
             params.put("userID", userID);
-            params.put("word", "Gleisbettreinigungsmaschiene");
-            params.put("Level", 1);
+            params.put("word", word);
+            params.put("Level", Integer.parseInt(level));
             rb.Create(sessionString, "CreateNewGame", params);
             String requestText = rb.Serialize();
             this.send(requestText);
@@ -163,11 +188,16 @@ public class ClientController extends Client
     }
     private void StartGame(){
         try{
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Start Game:");
+            System.out.print("gameID:");
+            Integer gameID = scanner.nextInt();
+
             RequestBuilder rb = new RequestBuilder();
             HashMap<String, Object> params = new HashMap<>();
             params.put("userID", userID);
             // TODO: Input for the GameID
-            params.put("gameID", 0);
+            params.put("gameID", gameID);
             rb.Create(sessionString, "StartGame", params);
             String requestText = rb.Serialize();
             this.send(requestText);
@@ -192,11 +222,16 @@ public class ClientController extends Client
     }
     private void MakeGuess(){
         try{
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Start Game:");
+            System.out.print("letter:");
+            String letter = scanner.next();
+
             RequestBuilder rb = new RequestBuilder();
             HashMap<String, Object> params = new HashMap<>();
             params.put("userID", userID);
             //TODO: Input for the Next Letter
-            params.put("letter", 'A');
+            params.put("letter", letter.charAt(0));
 
             rb.Create(sessionString, "MakeGuess", params);
             String requestText = rb.Serialize();
@@ -226,90 +261,210 @@ public class ClientController extends Client
             if(response.Object instanceof UserInfo){
                 sessionString = ((UserInfo)response.Object).SessionString;
                 userID = ((UserInfo)response.Object).UserID;
-                //TODO: Print that Registering was a Success
+                System.out.println("+++Registration Success => Your User ID: " + userID + "+++");
+                return;
             }
         }
         _waitingState = WaitingState.None;
+        System.out.println("!!!!---ERROR---!!!!");
     }
     private void HandleLoginResponse(Response response) {
         if(response.Object != null){
             if(response.Object instanceof UserInfo){
                 sessionString = ((UserInfo)response.Object).SessionString;
                 userID = ((UserInfo)response.Object).UserID;
-                //TODO: Print that Logging in was a Success
-            }
-        }
-        _waitingState = WaitingState.None;
-    }
-    private void HandleCreateNewGameResponse(Response response) {
-        if(response.Object != null){
-            if((boolean)response.Object){
-                //TODO: Print that creating a new game was a success:
-                _waitingState = WaitingState.None;
+                System.out.println("+++ Login Success => Your User ID: " + userID + "+++");
                 return;
             }
         }
         _waitingState = WaitingState.None;
+        System.out.println("!!!!---ERROR---!!!!");
+    }
+    private void HandleCreateNewGameResponse(Response response) {
+        if(response.Object != null){
+            if((boolean)response.Object){
+                System.out.println("+++Create New Game Success+++");
+                _waitingState = WaitingState.None;
+                return;
+            }
+        }
+        System.out.println("!!!!---ERROR---!!!!");
+        _waitingState = WaitingState.None;
     }
     private void HandleGetAllGamesResponse(Response response) {
         if(response.Object != null){
-            if(response.Object instanceof List<?>){
-                List<Game> allGames = (List<Game>)response.Object;
-                //TODO: Print all Games out.
+            if(response.Object instanceof ListModelGame){
+                ListModelGame model = (ListModelGame)response.Object;
+                System.out.println("+++Get all Games Success+++");
+                model.Games.toFirst();
+                while (model.Games.hasAccess()){
+                    System.out.println("Game: ID:" + model.Games.getContent().ID + " Word-Length:" + model.Games.getContent().Word.length() + " Level:" + model.Games.getContent().Level);
+                    model.Games.next();
+                }
+                return;
             }
         }
+        System.out.println("!!!!---ERROR---!!!!");
         _waitingState = WaitingState.None;
     }
     private void HandleGetAllPlayedGamesResponse(Response response){
         if(response.Object != null){
-            if(response.Object instanceof List<?>){
-                List<Game> allPlayedGames = (List<Game>)response.Object;
-                //TODO: Print all Games out.
+            if(response.Object instanceof ListModelGame){
+                ListModelGame model = (ListModelGame)response.Object;
+                System.out.println("+++Get all PlayedGames Success+++");
+                model.Games.toFirst();
+                while (model.Games.hasAccess()){
+                    System.out.println("Game: ID:" + model.Games.getContent().ID + " Word-Length:" + model.Games.getContent().Word.length() + " Level:" + model.Games.getContent().Level);
+                    model.Games.next();
+                }
+                return;
             }
         }
+        System.out.println("!!!!---ERROR---!!!!");
         _waitingState = WaitingState.None;
     }
     private void HandleGetAllUnPlayedGamesResponse(Response response){
         if(response.Object != null){
-            if(response.Object instanceof List<?>){
-                List<Game> allUnPlayedGames = (List<Game>)response.Object;
-                //TODO: Print all Games out.
+            if(response.Object instanceof ListModelGame){
+                ListModelGame model = (ListModelGame)response.Object;
+                System.out.println("+++Get all UnPlayedGames Success+++");
+                model.Games.toFirst();
+                while (model.Games.hasAccess()){
+                    System.out.println("Game: ID:" + model.Games.getContent().ID + " Word-Length:" + model.Games.getContent().Word.length() + " Level:" + model.Games.getContent().Level);
+                    model.Games.next();
+                }
+                return;
             }
         }
+        System.out.println("!!!!---ERROR---!!!!");
         _waitingState = WaitingState.None;
     }
     private void HandleStartGameResponse(Response response){
         if(response.Object != null){
             if((boolean)response.Object){
-                //TODO: Print that the Game has started
+                System.out.println("+++Game Starting Success+++");
+                return;
             }
         }
+        System.out.println("!!!!---ERROR---!!!!");
         _waitingState = WaitingState.None;
     }
     private void HandleStopGameResponse(Response response){
         if(response.Object != null){
             if(response.Object instanceof GameStatistics){
-
-                //TODO: Print the final Game Statistics and that stopping the game was successfully
+                GameStatistics gameStatistics = (GameStatistics)response.Object;
+                System.out.println("+++Game Stopped Success+++");
+                System.out.println("GameStatistics:");
+                System.out.println("StartedAt:" + gameStatistics.StartedAt);
+                System.out.println("MaxTries:" + gameStatistics.MaxTries);
+                System.out.println("WrongTries:" + gameStatistics.WrongTries);
+                System.out.println("Won:" + gameStatistics.Won);
+                System.out.println("CorrectTries:" + gameStatistics.CorrectTries);
+                return;
             }
         }
+        System.out.println("!!!!---ERROR---!!!!");
         _waitingState = WaitingState.None;
     }
     private void HandleMakeGuessResponse(Response response){
         if(response.Object != null){
             if(response.Object instanceof GameStatistics){
-                //TODO: Print the new Game Statistics and if the guess was correct.
+                GameStatistics gameStatistics = (GameStatistics)response.Object;
+                System.out.println("+++Game Make Guess Success+++");
+                System.out.println("GameStatistics:");
+                System.out.println("StartedAt:" + gameStatistics.StartedAt);
+                System.out.println("MaxTries:" + gameStatistics.MaxTries);
+                System.out.println("WrongTries:" + gameStatistics.WrongTries);
+                System.out.println("Won:" + gameStatistics.Won);
+                System.out.println("CorrectTries:" + gameStatistics.CorrectTries);
+
+                if(gameStatistics.CorrectTries + gameStatistics.WrongTries >= gameStatistics.MaxTries){
+                    System.out.println("YOU LOST");
+                }else if(gameStatistics.Won){
+                    System.out.println("YOU WON");
+                }
+                return;
             }
         }
+        System.out.println("!!!!---ERROR---!!!!");
         _waitingState = WaitingState.None;
     }
-    private void HandleGetUserProfileResponse(Response response){}
+    private void HandleGetUserProfileResponse(Response response){
+        if(response.Object != null){
+            if(response.Object instanceof User){
+                User user = (User)response.Object;
+                System.out.println("+++Get User Profile Success+++");
+                System.out.println("Your Profile:");
+                System.out.println("ID:" + user.ID);
+                System.out.println("Username:" + user.UserName);
+                System.out.println("Email:" + user.Email);
+                System.out.println("Password:" + user.Password);
+                System.out.println("Current Game:" + user.CurrentGame.Game.ID);
+
+                return;
+            }
+        }
+        System.out.println("!!!!---ERROR---!!!!");
+        _waitingState = WaitingState.None;
+    }
 
 
 
     public static void main(String[] args){
         ClientController c = new ClientController("127.0.0.1", 8000);
-        c.Register();
+        boolean running = true;
+        Scanner scanner = new Scanner(System.in);
+        while(running){
+            System.out.println("Hangman");
+            System.out.println("Main-Menu");
+            System.out.println("0. Exit");
+            System.out.println("1. Register");
+            System.out.println("2. Login");
+            System.out.println("3. Get User Profile");
+            System.out.println("4. Create New Game");
+            System.out.println("5. Print All Games");
+            System.out.println("6. Print All Played Games");
+            System.out.println("7. Print All Unplayed Games");
+            System.out.println("8. Start Game");
+            System.out.println("9. Make Guess");
+            System.out.println("10. Stop Game");
+            String cmd = scanner.nextLine();
+            switch(cmd){
+                case "0" :
+                    running = false;
+                    break;
+                case "1" :
+                    c.Register();
+                    break;
+                case "2" :
+                    c.Login();
+                    break;
+                case "3" :
+                    c.GetUserProfile();
+                    break;
+                case "4" :
+                    c.CreateNewGame();
+                    break;
+                case "5" :
+                    c.GetAllGames();
+                    break;
+                case "6" :
+                    c.GetAllPlayedGames();
+                    break;
+                case "7" :
+                    c.GetAllUnPlayedGames();
+                    break;
+                case "8" :
+                    c.StartGame();
+                    break;
+                case "9" :
+                    c.MakeGuess();
+                    break;
+                case "10" :
+                    c.StopGame();
+                    break;
+            }
+        }
     }
 
 

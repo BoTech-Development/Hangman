@@ -18,6 +18,14 @@ public class RequestInvoker
         this.controller = controller;
         methodDefinitions.put("Register", new ArrayList<>(Arrays.asList("ipAddress", "hostname", "userName", "password", "email")));
         methodDefinitions.put("Login", new ArrayList<>(Arrays.asList("userName", "password", "ipAddress", "hostname")));
+        methodDefinitions.put("GetUserProfile", new ArrayList<>(Arrays.asList("userID")));
+        methodDefinitions.put("CreateNewGame", new ArrayList<>(Arrays.asList("userID", "word", "Level")));
+        methodDefinitions.put("GetAllGames", new ArrayList<>());
+        methodDefinitions.put("GetAllPlayedGames", new ArrayList<>(Arrays.asList("userID")));
+        methodDefinitions.put("GetAllUnPlayedGames", new ArrayList<>(Arrays.asList("userID")));
+        methodDefinitions.put("StopGame", new ArrayList<>(Arrays.asList("userID")));
+        methodDefinitions.put("MakeGuess", new ArrayList<>(Arrays.asList("userID", "letter")));
+        methodDefinitions.put("StartGame", new ArrayList<>(Arrays.asList("userID", "gameID")));
     }
     public ResponseBuilder Invoke(Request request){
 

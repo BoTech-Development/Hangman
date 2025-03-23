@@ -39,7 +39,7 @@ public class RequestBuilder extends BuilderBase
 
         for (Map.Entry<String, Object> param : currentRequest.Parameters.entrySet())
         {
-            if(param.getValue().getClass().isPrimitive() || param.getValue().getClass().getName().contains("String") || param.getValue().getClass().getName().contains("Character"))
+            if(param.getValue().getClass().isPrimitive() || param.getValue().getClass().getName().contains("String") || param.getValue().getClass().getName().contains("Character") || param.getValue().getClass().getName().contains("Integer"))
             {
                 requestString += "Param:" + param.getKey() + ":" + param.getValue().getClass().getName() + "=" + param.getValue() + ";";//\n";
             }

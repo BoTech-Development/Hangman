@@ -3,6 +3,7 @@ import Abitur.List;
 import Abitur.Server;
 import Server.Models.Game;
 import Server.Models.GameStatistics;
+import Server.Models.Protocol.ListModelGame;
 import Server.Models.Protocol.Request;
 import Server.Models.Protocol.UserInfo;
 import Server.Models.Session;
@@ -153,16 +154,15 @@ public class ServerController extends Server
             Duration diff = Duration.between(currentSession.CreationDate, LocalDateTime.now());
             if(diff.toMinutes() < 20) {
                 return new UserInfo(currentSession.GetDecodedUniqueSessionString(), user.ID);
-            }else{
-                // Create new Session for user
-                Session session = new Session(ipAddress, hostname);
-                user.Sessions.append(session);
-                return new UserInfo(session.GetDecodedUniqueSessionString(), user.ID);
             }
+        }else{
+            // Create new Session for user
+            Session session = new Session(ipAddress, hostname);
+            user.Sessions.append(session);
+            return new UserInfo(session.GetDecodedUniqueSessionString(), user.ID);
         }
         return null;
     }
-
     public boolean CreateNewGame(int userID, String word, int Level)
     {
         Game game  = new Game();
@@ -177,23 +177,23 @@ public class ServerController extends Server
         }
         return false;
     }
-    public List<Game> GetAllGames()
+    public ListModelGame GetAllGames()
     {
-        return Games;
+        return new ListModelGame(Games);
     }
-    public List<Game> GetAllPlayedGames(int userID)
+    public ListModelGame GetAllPlayedGames(int userID)
     {
         User user = ListService.Find(Users, ListService.GetStandardUserSearchMethod(userID));
         if(user != null) {
-            return user.PlayedGames;
+            return new ListModelGame(user.PlayedGames);
         }
         return null;
     }
-    public List<Game> GetAllUnPlayedGames(int userID)
+    public ListModelGame GetAllUnPlayedGames(int userID)
     {
         User user = ListService.Find(Users, ListService.GetStandardUserSearchMethod(userID));
         if(user != null) {
-            return user.PlayedGames;
+            return new ListModelGame(user.PlayedGames);
         }
         return null;
     }
@@ -201,7 +201,7 @@ public class ServerController extends Server
     {
         User selectedUser = ListService.Find(Users, ListService.GetStandardUserSearchMethod(userID));
         if(selectedUser != null) {
-            if(selectedUser.CurrentGame != null) {
+            if(selectedUser.CurrentGame.Game.ID != -1) {
                 return false; // The user plays a game
             }else {
                 // The user plays no game
@@ -227,7 +227,16 @@ public class ServerController extends Server
             }
             else
             {
-                return  selectedUser.CurrentGame.Game.Word.contains(letter.toString()) ? selectedUser.CurrentGame : null;
+
+                if(selectedUser.CurrentGame.Game.Word.contains(letter.toString())) {
+                   selectedUser.CurrentGame.CorrectTries++;
+
+                }else{
+                    selectedUser.CurrentGame.WrongTries++;
+                }
+                if(selectedUser.CurrentGame.CorrectTries == selectedUser.CurrentGame.MaxTries) {selectedUser.CurrentGame.Won = true;}
+                if(selectedUser.CurrentGame.CorrectTries + selectedUser.CurrentGame.WrongTries >= selectedUser.CurrentGame.MaxTries) {selectedUser.CurrentGame.Won = false;}
+                return selectedUser.CurrentGame;
             }
         }
         return null;
@@ -242,8 +251,10 @@ public class ServerController extends Server
             }
             else
             {
+                GameStatistics currentGame = selectedUser.CurrentGame;
                 selectedUser.PlayedGames.append(selectedUser.CurrentGame.Game);
-                return  selectedUser.CurrentGame;
+                selectedUser.CurrentGame.Game.ID = -1;
+                return  currentGame;
             }
         }
         return null;

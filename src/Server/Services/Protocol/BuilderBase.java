@@ -49,9 +49,13 @@ public class BuilderBase
                         while (list.hasAccess()) {
                             Object listContent = list.getContent();
                             if (listContent != null) {
+                                paramString += "{";
                                 for (Field listContentField : listContent.getClass().getFields())
                                     if (Modifier.isPublic(listContentField.getModifiers()))
-                                        CreatParamString(paramString, listContent, listContentField);
+                                        paramString += CreatParamString("", listContent, listContentField) + ",";
+                                // Remove the last ,
+                                paramString = paramString.substring(0, paramString.length() - 1);
+                                paramString += "}";
                             } else {
                                 paramString += field.getName() + "=" + field.get(object).toString();
                                 //return paramString;

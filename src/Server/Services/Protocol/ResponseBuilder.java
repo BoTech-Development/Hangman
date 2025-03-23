@@ -43,9 +43,14 @@ public class ResponseBuilder extends BuilderBase
         responseString += "ResponseInfo:TimeElapsed=" + currentResponse.ResponseInfo.TimeElapsed + ";";//\n";
         responseString += "ResponseInfo:ObjectType=" + currentResponse.ResponseInfo.ObjectType + ";";//\n";
         if(currentResponse.Object != null) {
-            if (currentResponse.Object.getClass().isPrimitive() || currentResponse.Object.getClass().getName().contains("String") || currentResponse.Object.getClass().getName().contains("Character")) {
+            if (currentResponse.Object instanceof Boolean) {
                 // The Type is Primitive => it is not necessary to use json
-                responseString += "Value:" + currentResponse.ResponseInfo.ObjectType + "=" + currentResponse.Object.toString() + ";";
+                if((Boolean) currentResponse.Object){
+                    responseString += currentResponse.ResponseInfo.ObjectType + ":Properties={TRUE};";
+                }else{
+                    responseString += currentResponse.ResponseInfo.ObjectType + ":Properties={FALSE};";
+                }
+
 
             }
             else

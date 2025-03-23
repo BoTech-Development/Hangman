@@ -1,6 +1,7 @@
 package Server.Models;
 
 import Abitur.List;
+import Server.Annotations.SerializableCollection;
 
 public class User
 {
@@ -11,8 +12,11 @@ public class User
     public boolean EmailVerified = false;
     private String verifyCode = "";
     public GameStatistics CurrentGame = new GameStatistics();
+    @SerializableCollection(GenericType = Game.class)
     public List<Game> PlayedGames = new List<Game>();
+    @SerializableCollection(GenericType = Game.class)
     public List<Game> CreatedGames = new List<Game>();
+    @SerializableCollection(GenericType = Session.class)
     public List<Session> Sessions = new List<Session>();
     public User(){}
     public User(String UserName, String Password, String Email){

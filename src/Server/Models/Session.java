@@ -11,6 +11,7 @@ public class Session
     public String IPAddress = "";
     public String Hostname = "";
     public LocalDateTime CreationDate;
+    public Session(){}
     public Session(String IPAddress, String Hostname)
     {
         this.IPAddress = IPAddress;

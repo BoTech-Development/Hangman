@@ -33,19 +33,20 @@ public class IDProvider
                     if (field.getName().equals("ID"))
                     {
                         try {
-                            switch (obj.getClass().getName()) {
-                                case "Session":
-                                    CurrentSessionID++;
-                                    field.setInt(obj, CurrentSessionID);
-                                    return true;
-                                case "User":
-                                    CurrentUserID++;
-                                    field.setInt(obj, CurrentUserID);
-                                    return true;
-                                case "Game":
-                                    CurrentGameID++;
-                                    field.setInt(obj, CurrentGameID);
-                                    return true;
+                            if(obj.getClass().getName().contains("Session")){
+                                CurrentSessionID++;
+                                field.setInt(obj, CurrentSessionID);
+                                return true;
+                            }
+                            if(obj.getClass().getName().contains("User")){
+                                CurrentUserID++;
+                                field.setInt(obj, CurrentUserID);
+                                return true;
+                            }
+                            if(obj.getClass().getName().contains("Game")){
+                                CurrentGameID++;
+                                field.setInt(obj, CurrentGameID);
+                                return true;
                             }
                         }catch (Exception e) {
                             System.out.println(e);
@@ -59,7 +60,7 @@ public class IDProvider
     }
     private boolean IsInAcceptedTypes(String className) {
         for (String acceptedType : AcceptedTypes) {
-            if (className.equals(acceptedType)) return true;
+            if (className.contains(acceptedType)) return true;
         }
         return false;
     }
